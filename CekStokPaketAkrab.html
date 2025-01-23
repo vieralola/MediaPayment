@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -317,27 +314,29 @@ pre {
     
 
     <script>
-        // Fungsi untuk menampilkan data dari API
-        async function fetchData() {
-            try {
-                const response = await fetch('https://api.khfy-store.com:8443/api-xl-v7/cek_stock_akrab');
-                const data = await response.json();
+const apiUrlEncoded = "aHR0cHM6Ly9hcGkua2hmeS1zdG9yZS5jb206ODQ0My9hcGkteGwtdjcvY2VrX3N0b2NrX2FrcmFi";
+const apiUrl = atob(apiUrlEncoded);
 
-                // Memeriksa apakah permintaan API berhasil
-                if (data.status) {
-                    const outputDiv = document.getElementById('output');
-                    // Menampilkan pesan
-                    outputDiv.innerHTML = `<h2>${data.message.replace(/\n/g, '<br><br>')}</h2>`;
-                } else {
-                    console.error('Gagal mengambil data:', data.message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
+// Fungsi untuk menampilkan data dari API
+async function fetchData() {
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        // Memeriksa apakah permintaan API berhasil
+        if (data.status) {
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = `<h2>${data.message.replace(/\n/g, '<br><br>')}</h2>`;
+        } else {
+            console.error('Gagal mengambil data:', data.message);
         }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
 
-        // Panggil fungsi fetchData saat halaman dimuat
-        fetchData();
+// Panggil fungsi fetchData saat halaman dimuat
+fetchData();
     </script>
 </body>
 </html>
