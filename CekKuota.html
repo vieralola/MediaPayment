@@ -389,89 +389,92 @@
   </div>
 
   <script>
-    async function cekKuota() {
-      const number = document.getElementById('phoneNumber').value;
-      const wrapper = document.getElementById("kuota-wrapper");
-      wrapper.innerHTML = "Memproses...";
+  async function cekKuota() {
+    const number = document.getElementById('phoneNumber').value;
+    const wrapper = document.getElementById("kuota-wrapper");
+    wrapper.innerHTML = "<h2>Memproses...</h2>";
 
-      try {
-        const response = await fetch('https://www.sidompul.hijaubiru.my.id/backend.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            action: 'check_package',
-            device_id: 'fake',
-            number: number
-          })
-        });
+    try {
+      const encodedUrl = "c2lkb21wdWwuaGlqYXViaXJ1Lm15Lmlk";
+      const baseUrl = atob(encodedUrl);
 
-        const res = await response.json();
-        const d = res.data;
-        wrapper.innerHTML = "";
+      const response = await fetch(`https://${baseUrl}/backend.php`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'check_package',
+          device_id: 'fake',
+          number: number
+        })
+      });
 
-        // Tambahkan info provider dan kartu
-        const infoBox = document.createElement("div");
-        infoBox.className = "info-box";
-        infoBox.innerHTML = `
-          <div class="info-title">Info Kartu</div>
-          <div class="info-line">Nomor: ${number}</div>
-          <div class="info-line">Provider: ${d.prefix.value}</div>
-          <div class="info-line">KTP Dukcapil: ${d.dukcapil.value}</div>
-          <div class="info-line">Jaringan: ${d.status_4g.value}</div>
-          <div class="info-line">Umur Kartu: ${d.active_card.value}</div>
-          <div class="info-line">Aktif Sampai: ${d.active_period.value}</div>
-          <div class="info-line">Masa Tenggang: ${d.grace_period.value}</div>
-        `;
-        wrapper.appendChild(infoBox);
+      const res = await response.json();
+      const d = res.data;
+      wrapper.innerHTML = "";
 
-        if (d.quotas.success && Array.isArray(d.quotas.value)) {
-          d.quotas.value.forEach(pkg => {
-            const paketBox = document.createElement("div");
-            paketBox.className = "paket";
+      // Tambahkan info provider dan kartu
+      const infoBox = document.createElement("div");
+      infoBox.className = "info-box";
+      infoBox.innerHTML = `
+        <div class="info-title">Info Kartu</div>
+        <div class="info-line">Nomor: ${number}</div>
+        <div class="info-line">Provider: ${d.prefix.value}</div>
+        <div class="info-line">KTP Dukcapil: ${d.dukcapil.value}</div>
+        <div class="info-line">Jaringan: ${d.status_4g.value}</div>
+        <div class="info-line">Umur Kartu: ${d.active_card.value}</div>
+        <div class="info-line">Aktif Sampai: ${d.active_period.value}</div>
+        <div class="info-line">Masa Tenggang: ${d.grace_period.value}</div>
+      `;
+      wrapper.appendChild(infoBox);
 
-            const header = document.createElement("div");
-            header.className = "paket-title";
-            header.innerText = pkg.name;
-            paketBox.appendChild(header);
+      if (d.quotas.success && Array.isArray(d.quotas.value)) {
+        d.quotas.value.forEach(pkg => {
+          const paketBox = document.createElement("div");
+          paketBox.className = "paket";
 
-            pkg.detail_quota.forEach(q => {
-              const item = document.createElement("div");
-              item.className = "kuota-item";
+          const header = document.createElement("div");
+          header.className = "paket-title";
+          header.innerText = pkg.name;
+          paketBox.appendChild(header);
 
-              const label = document.createElement("div");
-              label.className = "kuota-label";
-              label.innerHTML = `<span>${q.name}</span><span>${q.remaining_text} / ${q.total_text}</span>`;
-              item.appendChild(label);
+          pkg.detail_quota.forEach(q => {
+            const item = document.createElement("div");
+            item.className = "kuota-item";
 
-              const bar = document.createElement("div");
-              bar.className = "bar";
+            const label = document.createElement("div");
+            label.className = "kuota-label";
+            label.innerHTML = `<span>${q.name}</span><span>${q.remaining_text} / ${q.total_text}</span>`;
+            item.appendChild(label);
 
-              const fill = document.createElement("div");
-              fill.className = "bar-fill";
-              let percent = parseFloat(q.percent);
-              fill.style.width = isNaN(percent) ? "0%" : `${percent}%`;
+            const bar = document.createElement("div");
+            bar.className = "bar";
 
-              bar.appendChild(fill);
-              item.appendChild(bar);
-              paketBox.appendChild(item);
-            });
+            const fill = document.createElement("div");
+            fill.className = "bar-fill";
+            let percent = parseFloat(q.percent);
+            fill.style.width = isNaN(percent) ? "0%" : `${percent}%`;
 
-            const reset = document.createElement("div");
-            reset.className = "reset-info";
-            reset.innerText = `Reset Kuota: ${pkg.date_end} 23:59 WIB`;
-            paketBox.appendChild(reset);
-
-            wrapper.appendChild(paketBox);
+            bar.appendChild(fill);
+            item.appendChild(bar);
+            paketBox.appendChild(item);
           });
-        } else {
-          wrapper.innerText = d.quotas.message || "Kuota tidak tersedia.";
-        }
-      } catch (err) {
-        wrapper.innerText = "Terjadi kesalahan: " + err.message;
+
+          const reset = document.createElement("div");
+          reset.className = "reset-info";
+          reset.innerText = `Reset Kuota: ${pkg.date_end} 23:59 WIB`;
+          paketBox.appendChild(reset);
+
+          wrapper.appendChild(paketBox);
+        });
+      } else {
+        wrapper.innerText = d.quotas.message || "Kuota tidak tersedia.";
       }
+    } catch (err) {
+      wrapper.innerText = "Terjadi kesalahan: " + err.message;
     }
+  }
     
     // Hanya izinkan angka pada input
         // Fungsi untuk hanya mengizinkan angka pada kedua input
